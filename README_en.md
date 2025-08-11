@@ -1,4 +1,4 @@
-[Русская версия](README.md)
+[Русская версия](README.md) | [English Version](README_en.md) | [中文版](README_zh.md) | [نسخه فارسی](README_fa.md)
 
 # Material Remnawave Subscription page
 
@@ -17,7 +17,7 @@ The ability to add additional groups to the apps section via the integration fil
 
 * **Individual Link Copying:** Ability to copy individual links (e.g., `vless://`, `trojan://` ) directly from the page, in addition to the main subscription link.
 
-* **Multi-language Support:** Page available in Russian and English with automatic browser language detection.
+* **Multi-language Support:** Availability of the page in Russian, English, Persian, and Chinese, with automatic detection of the browser language.
 
 ## Screenshots
 
