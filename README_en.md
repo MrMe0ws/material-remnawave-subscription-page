@@ -14,6 +14,9 @@ This repository contains the source code for the subscription page of the Remnaw
 * * **Custom Groups**  
 The ability to add additional groups to the apps section via the integration file, [for example, the `TV section`](https://github.com/legiz-ru/my-remnawave/blob/main/sub-page/multiapp/app-config.json).
 
+*   **Branding Support:** Configure logo and support link through `logoUrl` and `supportUrl` parameters in `app-config.json` configuration for page personalization.
+
+*   **remnawave-json Support:** Ability to integrate the subscription page into https://github.com/Jolymmiels/remnawave-json (adapted index.html file is located in the remnawave-json folder).
 
 * **Individual Link Copying:** Ability to copy individual links (e.g., `vless://`, `trojan://` ) directly from the page, in addition to the main subscription link.
 

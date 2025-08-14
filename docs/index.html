@@ -145,6 +145,17 @@
     .appbar { background-color: var(--color-primary-container); display: flex; flex-direction: row; justify-content: space-between; height: 4rem; width: 100%; z-index: 100; position: fixed; top: 0; left: 0; }
     .appbar-start-box, .appbar-end-box { display: flex; flex-direction: row; align-items: center; }
     .appbar-heading { font-size: large; color: var(--color-on-primary-container); }
+
+    #branding-logo {
+        display: none;
+        max-height: 2rem;
+        max-width: 2rem;
+        object-fit: contain;
+    }
+
+    #branding-logo:not(.hidden) {
+        display: inline-block !important;
+    }
     
     .btn { background-color: var(--color-primary); border: 0.0625rem solid var(--color-outline); border-radius: 0.625rem; height: 2.5rem; padding-left: 1.5rem; padding-right: 1.5rem; font-size: medium; font-weight: 500; color: var(--color-on-primary); transition: background-color 0.3s, color 0.3s, border-color 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; text-decoration: none; }
     .btn:hover { background-color: var(--color-primary-container); color: var(--color-on-primary-container); }
@@ -229,7 +240,7 @@
     
     #settings-modal { position: fixed; z-index: 2010; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.25); display: none; align-items: center; justify-content: center; padding: 16px; }
     #settings-modal.active { display: flex; }
-    .settings-content { background: var(--color-surface); border-radius: 1.5rem; box-shadow: 0 3px 16px rgba(0,0,0,0.13); min-width: 320px; max-width: 92vw; max-height: calc(100vh - 32px); padding: 1.5rem; position: relative; color: var(--color-on-surface); display: flex; flex-direction: column; gap: 1.2rem; overflow-y: auto; }
+    .settings-content { background: var(--color-surface); border-radius: 1.5rem; box-shadow: 0 3px 16px rgba(0,0,0,0.13); width: 320px; max-width: 92vw; max-height: calc(100vh - 32px); padding: 1.5rem; position: relative; color: var(--color-on-surface); display: flex; flex-direction: column; gap: 1.2rem; overflow-y: auto; }
     .settings-close { position: static; color: var(--color-on-surface-variant); font-size: 1.8rem; cursor: pointer; }
     .settings-close:hover { color: var(--color-primary); }
     .settings-title { font-size: 1.1em; font-weight: bold; color: var(--color-primary); margin-bottom: 0; flex-grow: 1; }
@@ -280,8 +291,9 @@
 </head>
 <body data-theme="candy-dark">
     <div class="appbar fixed top-0 z-1">
-        <div class="appbar-start-box">
-            <span id="title" class="appbar-heading ml-6" data-i18n="page_title">Подписка</span>
+        <div class="appbar-start-box pl-4 items-center gap-2">
+            <img id="branding-logo" class="h-8 w-8 hidden" src="" alt="Logo" onerror="this.style.display='none'">
+            <span class="appbar-heading">Material</span>
         </div>
         <div class="appbar-end-box">
             <button id="settings-button" class="btn btn-appbar p-3 mr-2" style="position: fixed; top: 12px; right: 16px;z-index:1001;">
@@ -450,6 +462,10 @@
                 <div class="navbar-item-icon"><span class="material-symbols-outlined">link</span></div>
                 <span data-i18n="nav_links">Ссылки</span>
             </button>
+            <button id="navbar-support" class="navbar-item hidden" onclick="openSupportUrl()">
+                <div class="navbar-item-icon"><span class="material-symbols-outlined">support_agent</span></div>
+                <span data-i18n="nav_support">Поддержка</span>
+            </button>
         </div>
     </div>
 
@@ -460,11 +476,12 @@
     let currentLanguage = 'ru';
     let currentSectionId = 'status-section';
     let appsConfig = null;
+    let supportUrl = '';
 
     const availablePalettes = ['candy', 'mint', 'latte', 'nautical', 'lavender', 'evergreen', 'red', 'grey'];
 
     // --- ОБНОВЛЕННЫЕ ИКОНКИ ---
-        const appIcons = {
+    const appIcons = {
         'happ': `<svg class="w-6 h-6" viewBox="0 0 32 32" fill="currentColor"><path d="M13.4,19.6l-7.9,7.9L5,30.4h6.6L13.4,19.6z" /><path d="M13.2,13.5L14.6,5l-7.9,7.9L4.2,27.4l7.9-7.9l0.2-1.2h1l4.9-4.9H13.2z" /><path d="M25.4,19.6L27.8,5l-7.9,7.9l-0.1,0.7h-0.6l-4.9,4.9h4.7l-1.5,9L25.4,19.6z" /><path d="M18.7,27.5l-0.5,2.9h6.6l1.8-10.8L18.7,27.5z" /><path d="M13.6,4.9l0.6-3.3H7.5L5.6,12.8L13.6,4.9z" /><path d="M18.8,12.8l7.9-7.9l0.6-3.3h-6.6L18.8,12.8z" /></svg>`,
         'sing-box': `<svg class="w-6 h-6" viewBox="0 0 32 32" fill="currentColor"><path d="M28.845 22.699c.608-.37.998-1.235 1-1.854V11.2s.008-.403-.417-.673L16.825 2.649s-1.48-.95-2.921 0L2.407 10.324c-.536.37-.558 1.036-.558 1.036l-.004 9.339s-.013 1.171.5 1.5l12.5 8 .048-11-12.158-7.694s-.556-.351.158-.76L14.345 3.2c1.032-.628 2.06-.03 2.06-.03l12.556 7.687c.604.254.158.444.158.444l-2.849 1.805s-.404.357-.888.112L12.356 5.134l-.48.316 13.47 8.249v3.5a.93.93 0 0 1-.362.745l-3.777 2.515s-.348.25-.362-.26v-3.5L7.43 8.359l-.542.369 13.036 8.158s.384.207-.056.446l-3.32 1.982v9.885s-.002.637-.702 1c0 0 .521.128 1.467-.432z"/></svg>`,
         'streisand': `<svg class="w-6 h-6" viewBox="0 0 32 32" fill="currentColor"><path d="M19.744 7.308c1.486-1.04 2.95-2.07 4.422-3.088.566-.392 1.131-.795 1.74-1.12.252-.137.625-.142.924-.095.185.028.424.246.471.42.041.152-.104.417-.251.536-.533.433-1.097.832-1.658 1.233-1.407 1.004-2.818 2.002-4.309 3.06.62.394 1.187.769 1.77 1.122.653.396.663.393 1.297-.063 1.596-1.15 3.18-2.314 4.786-3.45.276-.195.629-.341.965-.39.193-.027.54.143.606.303.073.18-.015.535-.17.666-.758.64-1.55 1.242-2.35 1.834-1.047.775-2.113 1.528-3.23 2.334.236.168.453.303.644.465.532.451 1.12.86 1.56 1.383.662.785.694 1.785.684 2.737-.014 1.28-.108 2.56-.224 3.836-.06.662-.573 1.11-1.053 1.536-.26.23-.56.42-.855.611-.3.195-.273.354.004.55 1.28.905 2.556 1.817 3.828 2.734.345.248.678.514 1.005.784.222.184.404.403.237.705-.165.299-.469.457-.784.364a3.595 3.595 0 0 1-1.006-.51c-1.432-.998-2.846-2.02-4.272-3.026a2.806 2.806 0 0 0-.585-.31c-.302-.12-.556-.166-.86.123-.402.383-.911.666-1.388.973-.29.187-.22.324.012.484 1.398.971 2.808 1.927 4.182 2.927.543.395 1.25.644 1.503 1.343l.06.168c-.249.125-.48.254-.722.36-.35.153-.638-.02-.91-.201-1.221-.816-2.438-1.637-3.66-2.452-.644-.43-1.3-.843-1.944-1.276-.232-.157-.391-.12-.621.038-.843.579-1.646 1.221-2.666 1.526-1.01.303-1.946.133-2.82-.38a21.5 21.5 0 0 1-1.688-1.112c-.297-.214-.53-.222-.83-.011-1.491 1.04-2.994 2.068-4.494 3.098-.303.208-.586.467-.922.597-.31.119-.683.135-1.022.114-.158-.01-.424-.214-.426-.334-.004-.225.078-.537.246-.667.778-.597 1.598-1.143 2.403-1.708.949-.665 1.9-1.33 2.847-1.998.127-.09.24-.195.39-.32l-1.404-1.005c-.183-.13-.353-.295-.558-.38-.43-.176-.766.08-1.081.303-1.548 1.09-3.08 2.2-4.64 3.276-.259.179-.621.285-.94.296-.186.006-.466-.21-.544-.39-.063-.144.051-.46.195-.57 1.143-.877 2.31-1.725 3.471-2.58.473-.348.946-.696 1.424-1.036.227-.161.227-.314.022-.485-.246-.206-.47-.444-.74-.615-.923-.584-1.233-1.457-1.254-2.443a90.785 90.785 0 0 1 0-4.112c.022-.935.463-1.693 1.248-2.265.415-.301.817-.619 1.223-.93.223-.171.254-.277-.03-.474-1.638-1.14-3.257-2.306-4.878-3.47a4.595 4.595 0 0 1-.527-.46c-.426-.417-.33-.827.27-.922.3-.047.7.043.948.213 1.396.95 2.758 1.946 4.133 2.923.443.315.897.613 1.333.936.305.226.552.018.768-.104.485-.272.934-.6 1.4-.903.367-.238.382-.335.03-.59C8.735 6.71 6.984 5.45 5.236 4.187c-.024-.017-.05-.03-.075-.048-.308-.22-.604-.465-.438-.879.117-.291.795-.464 1.16-.276.483.248.946.538 1.388.847a508.895 508.895 0 0 1 4.557 3.233c.247.177.466.212.727.038.378-.251.792-.459 1.147-.736 1.327-1.037 3.255-1.016 4.883.146.38.272.771.53 1.16.796zm-3.486 13.251a3.825 3.825 0 0 0 2.517-.692c2.212-1.544 4.404-3.113 6.642-4.622 1.355-.914 1.328-2.708.124-3.616-.642-.484-1.338-.902-2.005-1.358-1.299-.886-2.61-1.755-3.887-2.672-1.205-.867-2.462-1.574-4.04-1.338-.606.091-1.28.208-1.766.53-2.342 1.56-4.617 3.213-6.945 4.793-1.392.945-1.293 2.726-.093 3.61.856.631 1.768 1.193 2.651 1.791 1.254.85 2.522 1.682 3.752 2.562.913.652 1.876 1.092 3.05 1.012zm-3.646 3.53c.131.132.847.62 1.168.827.503.323.989.178 1.06-.388.077-.614.098-1.26-.024-1.862-.077-.377-.387-.798-.721-1.027-2.463-1.687-4.957-3.333-7.445-4.988-.522-.347-1.01-.196-1.084.394a6.33 6.33 0 0 0 .02 1.822c.057.347.33.706.604.96.36.334.81.583 1.24.84.106.062.213-.079.279-.141-.397-.39-.633-.531-1.053-.773-.542-.312-.768-.792-.822-1.35a4.932 4.932 0 0 1 .039-1.11c.071-.537.223-.592.676-.29l7.016 4.68c.955.636 1.317 1.72.935 2.785-.102.285-.258.36-.529.162-.26-.191-.683-.513-.968-.665-.108-.059-.145.124-.391.124zm6.435.194c-.004-.052-.323-.17-.442-.111-.236.119-.442.289-.665.431-.347.223-.512.175-.567-.227-.06-.435-.132-.897-.039-1.315.087-.393.282-.873.599-1.091 2.48-1.71 5-3.364 7.504-5.043.31-.207.5-.114.533.192.053.493.082.996.037 1.487-.046.504-.34.893-.81 1.166-.39.227-.753.498-1.128.75.008.047.325.173.43.114.32-.18.605-.417.924-.6.671-.381.935-.981.988-1.679a5.21 5.21 0 0 0-.046-1.11c-.114-.814-.546-.989-1.247-.522L18 21.475c-1.004.67-1.416 2.12-.914 3.21.195.424.529.53.935.28.35-.217.685-.454 1.027-.682zm-7.498-1.273c-.743-.497-1.481-1-2.236-1.48-.087-.055-.226.106-.362.12.732.592 1.428 1.096 2.157 1.564.109.07.43-.149.44-.204zm8.787-.002c.002.048.31.194.403.134.74-.472 1.466-.965 2.197-1.451-.008-.04-.339-.176-.436-.114-.73.464-1.445.951-2.164 1.431z"/></svg>`,
@@ -493,8 +510,8 @@
             apps_title: 'Приложения', choose_app_title: 'Выберите приложение', choose_platform_title: 'Выберите платформу',
             username_label: 'Имя пользователя:', status_label: 'Статус:', expires_at_label: 'Срок действия:',
             days_left_label: 'Дней осталось:', traffic_label: 'Трафик:', traffic_reset_strategy_label: 'Сброс трафика:',
-            subscription_link_label: 'Ссылка подписки', server_label: 'Сервер', copied_to_clipboard: 'Скопировано в буфер обмена!',
-            nav_status: 'Статус', nav_apps: 'Приложения', nav_links: 'Ссылки', settings_title: 'Настройки',
+            subscription_link_label: 'Ссылка подписки', support_link_label: 'Ссылка поддержки', server_label: 'Сервер', copied_to_clipboard: 'Скопировано в буфер обмена!',
+            nav_status: 'Статус', nav_apps: 'Приложения', nav_links: 'Ссылки', nav_support: 'Поддержка', settings_title: 'Настройки',
             theme_label: 'Цветовая схема:', brightness_label: 'Яркость:', language_label: 'Язык:',
             light_mode: 'Светлая', dark_mode: 'Тёмная', auto_mode: 'Авто', candy_theme: 'Candy', mint_theme: 'Mint',
             latte_theme: 'Latte', nautical_theme: 'Nautical', lavender_theme: 'Lavender', evergreen_theme: 'Evergreen',
@@ -511,8 +528,8 @@
             apps_title: 'Applications', choose_app_title: 'Choose Application', choose_platform_title: 'Choose Platform',
             username_label: 'Username:', status_label: 'Status:', expires_at_label: 'Expires:',
             days_left_label: 'Days left:', traffic_label: 'Traffic:', traffic_reset_strategy_label: 'Traffic reset:',
-            subscription_link_label: 'Subscription link', server_label: 'Server', copied_to_clipboard: 'Copied to clipboard!',
-            nav_status: 'Status', nav_apps: 'Apps', nav_links: 'Links', settings_title: 'Settings',
+            subscription_link_label: 'Subscription link', support_link_label: 'Support Link', server_label: 'Server', copied_to_clipboard: 'Copied to clipboard!',
+            nav_status: 'Status', nav_apps: 'Apps', nav_links: 'Links', nav_support: 'Support', settings_title: 'Settings',
             theme_label: 'Color scheme:', brightness_label: 'Brightness:', language_label: 'Language:',
             light_mode: 'Light', dark_mode: 'Dark', auto_mode: 'Auto', candy_theme: 'Candy', mint_theme: 'Mint',
             latte_theme: 'Latte', nautical_theme: 'Nautical', lavender_theme: 'Lavender', evergreen_theme: 'Evergreen',
@@ -529,8 +546,8 @@
             apps_title: 'برنامه‌ها', choose_app_title: 'انتخاب برنامه', choose_platform_title: 'انتخاب پلتفرم',
             username_label: 'نام کاربری:', status_label: 'وضعیت:', expires_at_label: 'انقضا:',
             days_left_label: 'روزهای باقی‌مانده:', traffic_label: 'ترافیک:', traffic_reset_strategy_label: 'بازنشانی ترافیک:',
-            subscription_link_label: 'لینک اشتراک', server_label: 'سرور', copied_to_clipboard: 'در کلیپ‌بورد کپی شد!',
-            nav_status: 'وضعیت', nav_apps: 'برنامه‌ها', nav_links: 'لینک‌ها', settings_title: 'تنظیمات',
+            subscription_link_label: 'لینک اشتراک', support_link_label: 'لینک پشتیبانی', server_label: 'سرور', copied_to_clipboard: 'در کلیپ‌بورد کپی شد!',
+            nav_status: 'وضعیت', nav_apps: 'برنامه‌ها', nav_links: 'لینک‌ها', nav_support: 'پشتیبانی', settings_title: 'تنظیمات',
             theme_label: 'طرح رنگ:', brightness_label: 'روشنایی:', language_label: 'زبان:',
             light_mode: 'روشن', dark_mode: 'تیره', auto_mode: 'خودکار', candy_theme: 'آب‌نبات', mint_theme: 'نعنا',
             latte_theme: 'لاته', nautical_theme: 'دریایی', lavender_theme: 'اسطوخودوس', evergreen_theme: 'همیشه‌سبز',
@@ -547,8 +564,8 @@
             apps_title: '应用程序', choose_app_title: '选择应用程序', choose_platform_title: '选择平台',
             username_label: '用户名:', status_label: '状态:', expires_at_label: '到期时间:',
             days_left_label: '剩余天数:', traffic_label: '流量:', traffic_reset_strategy_label: '流量重置:',
-            subscription_link_label: '订阅链接', server_label: '服务器', copied_to_clipboard: '已复制到剪贴板！',
-            nav_status: '状态', nav_apps: '应用', nav_links: '链接', settings_title: '设置',
+            subscription_link_label: '订阅链接', support_link_label: '支持链接', server_label: '服务器', copied_to_clipboard: '已复制到剪贴板！',
+            nav_status: '状态', nav_apps: '应用', nav_links: '链接', nav_support: '支持', settings_title: '设置',
             theme_label: '配色方案:', brightness_label: '亮度:', language_label: '语言:',
             light_mode: '浅色', dark_mode: '深色', auto_mode: '自动', candy_theme: '糖果', mint_theme: '薄荷',
             latte_theme: '拿铁', nautical_theme: '航海', lavender_theme: '薰衣草', evergreen_theme: '常青',
@@ -590,15 +607,13 @@
         ['status-section', 'apps-section', 'links-section'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
         document.getElementById(sectionId)?.classList.remove('hidden');
         
-        document.querySelectorAll('.navbar-item').forEach(item => item.classList.remove('navbar-item-active'));
+        document.querySelectorAll('.navbar-item').forEach(item => {
+            if (item.id !== 'navbar-support') { // Не трогаем кнопку поддержки
+                item.classList.remove('navbar-item-active');
+            }
+        });
         document.getElementById(navbarItemId)?.classList.add('navbar-item-active');
 
-        const titles = {
-            'status-section': getTranslation('nav_status'),
-            'apps-section': getTranslation('apps_title'),
-            'links-section': getTranslation('nav_links')
-        };
-        document.getElementById('title').textContent = titles[sectionId] || getTranslation('page_title');
         currentSectionId = sectionId;
 
         if (sectionId === 'apps-section' && window.appsData) {
@@ -615,14 +630,13 @@
             else el.textContent = translation;
         });
         document.getElementById('page-title').textContent = getTranslation('page_title');
-        setPage(document.querySelector('.navbar-item-active')?.id, currentSectionId);
         updateDisplayedDataTranslations();
     }
 
     async function loadAppsConfig() {
         if (appsConfig !== null) return appsConfig;
         try {
-            const response = await fetch('/assets/app-config.json');
+            const response = await fetch('https://raw.githubusercontent.com/legiz-ru/my-remnawave/refs/heads/main/sub-page/multiapp/app-config.json');
             if (!response.ok) throw new Error('Config file not found');
             const text = await response.text();
             if (text.trim().startsWith('<')) throw new Error('Received HTML instead of JSON');
@@ -674,10 +688,11 @@
     async function loadSubscriptionData() {
         try {
             const appsConfigPromise = loadAppsConfig();
-            const encodedPanelData = '<%= panelData %>';
+            const encodedPanelData = 'ewogICJyZXNwb25zZSI6IHsKICAgICJpc0ZvdW5kIjogdHJ1ZSwKICAgICJ1c2VyIjogewogICAgICAic2hvcnRVdWlkIjogIjBkQ0JrX2h3MDEtc1FLTWMiLAogICAgICAiZGF5c0xlZnQiOiAzMDg1LAogICAgICAidHJhZmZpY1VzZWQiOiAiMy41NSBHaUIiLAogICAgICAidHJhZmZpY0xpbWl0IjogIjIuMDAgVGlCIiwKICAgICAgInVzZXJuYW1lIjogImxlZ2l6IiwKICAgICAgImV4cGlyZXNBdCI6ICIyMDMzLTEyLTEyVDE5OjIyOjAwLjAwMFoiLAogICAgICAiaXNBY3RpdmUiOiB0cnVlLAogICAgICAidXNlclN0YXR1cyI6ICJBQ1RJVkUiLAogICAgICAidHJhZmZpY0xpbWl0U3RyYXRlZ3kiOiAiTU9OVEgiCiAgICB9LAogICAgImxpbmtzIjogWwogICAgICAidmxlc3M6Ly85MjdjZDZkOS1lYjYyLTRiZGYtYTk1My1kODkzZmI2MTJiNDVAZXhhbXBsZS5jb206NDQzP3NlY3VyaXR5PXRscyZ0eXBlPXdzJmhlYWRlclR5cGU9JnBhdGg9JTJGd3NfcmVtbmFuMGRlX3J1c3NsYW5kJmhvc3Q9ZXhhbXBsZS5jb20mc25pPWV4YW1wbGUuY29tJmZwPWNocm9tZSZhbHBuPWh0dHAlMkYxLjEjJUYwJTlGJTg3JUI3JUYwJTlGJTg3JUJBJTIwUnVzc2lhJTIwV1MiLAogICAgICAidmxlc3M6Ly85MjdjZDZkOS1lYjYyLTRiZGYtYTk1My1kODkzZmI2MTJiNDVAZXhhbXBsZS5jb206NDQzP3NlY3VyaXR5PXJlYWxpdHkmdHlwZT10Y3AmaGVhZGVyVHlwZT0mcGF0aD0maG9zdD1leGFtcGxlLmNvbSZmbG93PXh0bHMtcnByeC12aXNpb24mc25pPWV4YW1wbGUuY29tJmZwPWNocm9tZSZwYms9SjhGeUN2WWhtOUJORVM5MDlHOEdBNWYzYURsczN0SzhWcjJwRHp3OHEyUSZzaWQ9NDNjZDM3N2U1ZGIyZWEzMSMlRjAlOUYlODclQjMlRjAlOUYlODclQjElMjBOZXRoZXJsYW5kcyIsCiAgICAgICJ2bGVzczovLzkyN2NkNmQ5LWViNjItNGJkZi1hOTUzLWQ4OTNmYjYxMmI0NUBleGFtcGxlLmNvbTo0NDM/c2VjdXJpdHk9cmVhbGl0eSZ0eXBlPXRjcCZoZWFkZXJUeXBlPSZwYXRoPSZob3N0PWV4YW1wbGUuY29tJmZsb3c9eHRscy1ycHJ4LXZpc2lvbiZzbmk9ZXhhbXBsZS5jb20mZnA9Y2hyb21lJnBiaz1pQkFCYTdPVldMQjVlZ3YzRDhLLTh2dFdQSUZRT2d6WDF1X2dlcmdOanhBJnNpZD1mZjEyYjUyNTA4ZWE5YmIwIyVGMCU5RiU4NyVBOSVGMCU5RiU4NyVBQSUyMEdlcm1hbnkiLAogICAgICAidmxlc3M6Ly85MjdjZDZkOS1lYjYyLTRiZGYtYTk1My1kODkzZmI2MTJiNDVAZXhhbXBsZS5jb206NDQzP3NlY3VyaXR5PXJlYWxpdHkmdHlwZT10Y3AmaGVhZGVyVHlwZT0mcGF0aD0maG9zdD1leGFtcGxlLmNvbSZmbG93PXh0bHMtcnByeC12aXNpb24mc25pPWV4YW1wbGUuY29tJmZwPWNocm9tZSZwYms9elhQYVdPSWNidXVPWlZTaVVZbU0zc0FIWno4cmo0VEhhY29tMm4xaEdUWSZzaWQ9NDNhMmM1ODZjZmIwNWQ2YyMlRjAlOUYlODclQUIlRjAlOUYlODclQjclMjBGcmFuY2UiLAogICAgICAidmxlc3M6Ly85MjdjZDZkOS1lYjYyLTRiZGYtYTk1My1kODkzZmI2MTJiNDVAZXhhbXBsZS5jb206NDQzP3NlY3VyaXR5PXRscyZ0eXBlPXdzJmhlYWRlclR5cGU9JnBhdGg9JTJGd3NfcmVtbmFuMGRlX3N3ZWRlbiZob3N0PWV4YW1wbGUuY29tJnNuaT1leGFtcGxlLmNvbSZmcD1jaHJvbWUmYWxwbj1odHRwJTJGMS4xIyVGMCU5RiU4NyVCOCVGMCU5RiU4NyVBQSUyMFN3ZWRlbiUyMFdTIiwKICAgICAgInZsZXNzOi8vOTI3Y2Q2ZDktZWI2Mi00YmRmLWE5NTMtZDg5M2ZiNjEyYjQ1QGV4YW1wbGUuY29tOjQ0Mz9zZWN1cml0eT10bHMmdHlwZT14aHR0cCZoZWFkZXJUeXBlPSZwYXRoPSUyRnhodHRwX3JlOXR5N3JpNiUyRiZob3N0PWV4YW1wbGUuY29tJm1vZGU9cGFja2V0LXVwJmV4dHJhPSU3QiUyMnhtdXglMjIlM0ElN0IlMjJjTWF4UmV1c2VUaW1lcyUyMiUzQTAlMkMlMjJtYXhDb25jdXJyZW5jeSUyMiUzQSUyMjE2LTMyJTIyJTJDJTIybWF4Q29ubmVjdGlvbnMlMjIlM0EwJTJDJTIyaEtlZXBBbGl2ZVBlcmlvZCUyMiUzQTAlMkMlMjJoTWF4UmVxdWVzdFRpbWVzJTIyJTNBJTIyNjAwLTkwMCUyMiUyQyUyMmhNYXhSZXVzYWJsZVNlY3MlMjIlM0ElMjIxODAwLTMwMDAlMjIlN0QlMkMlMjJoZWFkZXJzJTIyJTNBJTdCJTdEJTJDJTIybm9HUlBDSGVhZGVyJTIyJTNBZmFsc2UlMkMlMjJ4UGFkZGluZ0J5dGVzJTIyJTNBJTIyMTAwLTEwMDAlMjIlMkMlMjJzY01heEVhY2hQb3N0Qnl0ZXMlMjIlM0ExMDAwMDAwJTJDJTIyc2NNaW5Qb3N0c0ludGVydmFsTXMlMjIlM0EzMCUyQyUyMnNjU3RyZWFtVXBTZXJ2ZXJTZWNzJTIyJTNBJTIyMjAtODAlMjIlN0Qmc25pPWV4YW1wbGUuY29tJmZwPWNocm9tZSZhbHBuPWgyJTJDaHR0cCUyRjEuMSMlRjAlOUYlODclQjglRjAlOUYlODclQUElMjBTd2VkZW4lMjBYSFRUUCIsCiAgICAgICJ2bGVzczovLzkyN2NkNmQ5LWViNjItNGJkZi1hOTUzLWQ4OTNmYjYxMmI0NUBleGFtcGxlLmNvbTo0NDM/c2VjdXJpdHk9dGxzJnR5cGU9aHR0cHVwZ3JhZGUmaGVhZGVyVHlwZT0mcGF0aD0lMkZodV9yZW1uYW4wZGVfc3dlZGVuJmhvc3Q9ZXhhbXBsZS5jb20mc25pPWV4YW1wbGUuY29tJmZwPWNocm9tZSZhbHBuPWh0dHAlMkYxLjEjJUYwJTlGJTg3JUI4JUYwJTlGJTg3JUFBJTIwU3dlZGVuJTIwSFUiCiAgICBdLAogICAgInNzQ29uZkxpbmtzIjoge30sCiAgICAic3Vic2NyaXB0aW9uVXJsIjogImh0dHBzOi8vdC5tZS9sZWdpel90cmFzaGJhZyIsCiAgICAiaGFwcCI6IHsKICAgICAgImNyeXB0b0xpbmsiOiAidC5tZS9sZWdpel90cmFzaGJhZyIKICAgIH0KICB9Cn0=';
             const decodedData = decodeAndParseData(encodedPanelData);
             const loadedAppsConfig = await appsConfigPromise;
-            setupLanguageSelector(loadedAppsConfig); // Настраиваем языки
+
+            setupLanguageSelector(loadedAppsConfig);
             const formattedData = formatApiData(decodedData, loadedAppsConfig);
             displayData(formattedData);
         } catch (error) {
@@ -696,7 +711,8 @@
             if (!match) return 0;
             const val = parseFloat(match[1]);
             const unit = match[2].toLowerCase();
-            const units = { 'b': 1, 'kb': 1024, 'mb': 1024**2, 'gb': 1024**3, 'tib': 1024**4, 'tb': 1024**4 };
+            const units = { 'b': 1, 'kb': 1024, 'mb': 1024**2, 'gb': 1024**3, 'tb': 1024**4, 'pb': 1024**5 };
+            units['kib'] = units.kb; units['mib'] = units.mb; units['gib'] = units.gb; units['tib'] = units.tb; units['pib'] = units.pb;
             return val * (units[unit] || 1);
         };
         const servers = (response.links || []).map(link => {
@@ -713,11 +729,86 @@
         });
         return {
             username: user.username, user_status: user.userStatus, expires_at: user.expiresAt,
-            days_left: user.daysLeft, traffic_used: parseTraffic(user.trafficUsed),
-            traffic_limit: parseTraffic(user.trafficLimit), traffic_reset_strategy: user.trafficLimitStrategy,
+            days_left: user.daysLeft, 
+            traffic_used: parseTraffic(user.trafficUsed),
+            traffic_limit: parseTraffic(user.trafficLimit),
+            traffic_used_str: user.trafficUsed || '0 B',
+            traffic_limit_str: user.trafficLimit || getTranslation('unlimited'),
+            traffic_reset_strategy: user.trafficLimitStrategy,
             subscription_url: response.subscriptionUrl, cryptoLink: response.happ?.cryptoLink,
             servers, apps: appsConfig
         };
+    }
+
+    function applyBranding(appsConfig) {
+        const branding = appsConfig?.config?.branding;
+        if (!branding) return;
+        
+        console.log('Applying branding:', branding);
+        
+        // Logo
+        if (branding.logoUrl) {
+            console.log('Setting logo URL:', branding.logoUrl);
+            const logoEl = document.getElementById('branding-logo');
+            if (logoEl) {
+                logoEl.onload = () => {
+                    console.log('Logo loaded successfully');
+                    // Убираем hidden и добавляем inline-block для отображения
+                    logoEl.classList.remove('hidden');
+                    logoEl.style.display = 'inline-block';
+                    logoEl.style.visibility = 'visible';
+                };
+                logoEl.onerror = () => {
+                    console.warn('Failed to load branding logo:', branding.logoUrl);
+                    logoEl.classList.add('hidden');
+                    logoEl.style.display = 'none';
+                };
+                logoEl.src = branding.logoUrl;
+            } else {
+                console.error('Logo element not found');
+            }
+        }
+                
+        // Support URL
+        if (branding.supportUrl) {
+            console.log('Setting support URL:', branding.supportUrl);
+            window.supportUrl = branding.supportUrl;
+            const supportNavBtn = document.getElementById('navbar-support');
+            if (supportNavBtn) {
+                supportNavBtn.classList.remove('hidden');
+            }
+
+            // Add support link to subscription links card
+            setTimeout(() => {
+                const subscriptionCard = document.getElementById('subscription-links-card');
+                const linksContainer = subscriptionCard?.querySelector('.flex.flex-col.gap-4.mt-4');
+                
+                if (linksContainer && !linksContainer.querySelector('[data-support-link]')) {
+                    const supportCard = document.createElement('div');
+                    supportCard.className = 'server-card';
+                    supportCard.setAttribute('data-support-link', 'true');
+                    
+                    supportCard.innerHTML = `
+                        <div class="server-header">
+                            <div class="server-info">
+                                <span class="server-name" data-i18n="support_link_label">${getTranslation('support_link_label')}</span>
+                            </div>
+                            <div class="server-actions">
+                                <button class="btn btn-tonal btn-icon" onclick="copyToClipboard('${branding.supportUrl}')">
+                                    <span class="material-symbols-outlined">content_copy</span>
+                                </button>
+                                <button class="btn btn-tonal btn-icon" onclick="showQRCode('${branding.supportUrl}', getTranslation('support_link_label') || 'Support Link')">
+                                    <span class="material-symbols-outlined">qr_code_2</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    linksContainer.appendChild(supportCard);
+                    console.log('Support link added to subscription card');
+                }
+            }, 100);
+        }
     }
 
     function displayData(data) {
@@ -725,9 +816,15 @@
         document.getElementById('loading-spinner').classList.add('hidden');
         window.currentUserStatus = data.user_status;
         window.currentExpiresAt = data.expires_at;
-        window.currentTrafficData = { used: data.traffic_used, limit: data.traffic_limit };
+        window.currentTrafficData = { 
+            used: data.traffic_used, 
+            limit: data.traffic_limit,
+            used_str: data.traffic_used_str,
+            limit_str: data.traffic_limit_str
+        };
         window.currentTrafficResetStrategy = data.traffic_reset_strategy;
         window.subscriptionUrlForCopy = data.subscription_url;
+        applyBranding(data.apps);
 
         document.getElementById('display-username').textContent = data.username;
         updateDisplayedDataTranslations(); 
@@ -771,7 +868,7 @@
         const trafficEl = document.getElementById('display-traffic');
         if (trafficEl && window.currentTrafficData) {
             const isUnlimited = window.currentTrafficData.limit === 0;
-            trafficEl.textContent = isUnlimited ? getTranslation('unlimited') : `${formatBytes(window.currentTrafficData.used)} / ${formatBytes(window.currentTrafficData.limit)}`;
+            trafficEl.textContent = isUnlimited ? getTranslation('unlimited') : `${window.currentTrafficData.used_str} / ${window.currentTrafficData.limit_str}`;
             document.getElementById('traffic-reset-field').style.display = isUnlimited ? 'none' : 'flex';
         }
         const resetEl = document.getElementById('display-traffic-reset-strategy');
@@ -932,7 +1029,6 @@
         const stepTitle = document.createElement('h5');
         stepTitle.className = 'app-step-title';
         
-        // ИСПРАВЛЕНА ЛОГИКА ПОЛУЧЕНИЯ КЛЮЧА ПЕРЕВОДА
         const translationKey = 'step_' + stepKey.replace(/([A-Z])/g, "_$1").toLowerCase().replace('_step', '');
         stepTitle.textContent = (step.title && step.title[currentLanguage]) || getTranslation(translationKey);
         stepDiv.appendChild(stepTitle);
@@ -959,14 +1055,34 @@
         if (stepKey === 'addSubscriptionStep') {
             const subButton = document.createElement('button');
             subButton.className = 'app-button';
-            let url = '#';
-            if (app.id === 'happ' && data.cryptoLink) url = data.cryptoLink;
-            else if (app.urlScheme && data.subscription_url) {
+            
+            let finalUrl = '#';
+
+            if (app.id === 'happ' && data.cryptoLink) {
+                finalUrl = data.cryptoLink;
+            } else if (app.urlScheme && data.subscription_url) {
                 let subUrl = data.subscription_url;
-                if (app.isNeedBase64Encoding) subUrl = btoa(subUrl);
-                url = app.urlScheme + subUrl;
+                if (app.isNeedBase64Encoding) {
+                    subUrl = btoa(subUrl);
+                }
+                finalUrl = app.urlScheme + subUrl;
             }
-            subButton.onclick = () => (window.Telegram?.WebApp.openLink(url) || window.open(url, '_blank'));
+
+            // Новая логика для определения среды и способа открытия
+            subButton.onclick = () => {
+                // Проверяем, запущено ли приложение в Telegram Mini App
+                const isTelegramMiniApp = !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData);
+                
+                if (isTelegramMiniApp) {
+                    // Внутри Telegram Mini App - используем redirect страницу
+                    const redirectUrl = `https://maposia.github.io/redirect-page/?redirect_to=${encodeURIComponent(finalUrl)}`;
+                    window.Telegram.WebApp.openLink(redirectUrl);
+                } else {
+                    // Обычный браузер - открываем напрямую
+                    window.open(finalUrl, '_blank');
+                }
+            };
+            
             subButton.innerHTML = `<span class="material-symbols-outlined">add_link</span><span>${getTranslation('add_subscription')}</span>`;
             buttonsContainer.appendChild(subButton);
         }
@@ -1040,6 +1156,14 @@
     function formatBytes(bytes) { if (!bytes) return '0 B'; const k = 1024, sizes = ['B', 'KB', 'MB', 'GB', 'TB'], i = Math.floor(Math.log(bytes) / Math.log(k)); return `${parseFloat((bytes / k**i).toFixed(2))} ${sizes[i]}`; }
     function openSettingsModal() { document.getElementById('settings-modal').classList.add('active'); updateSettingsUI(); }
     function closeSettingsModal() { document.getElementById('settings-modal').classList.remove('active'); }
+    function openSupportUrl() {
+        if (window.supportUrl) {
+            window.open(window.supportUrl, '_blank');
+            console.log('Opening support URL:', window.supportUrl);
+        } else {
+            console.warn('Support URL not set');
+        }
+    }
     function selectPalette(p) { currentTheme = p; updateTheme(); updateSettingsUI(); saveSettings(); }
     function selectBrightness(b) { currentBrightness = b; updateTheme(); updateSettingsUI(); saveSettings(); }
     function selectLanguage(l) { currentLanguage = l; applyTranslations(); updateSettingsUI(); saveSettings(); }
@@ -1092,6 +1216,7 @@
     window.closeQRModal = closeQRModal;
     window.openSettingsModal = openSettingsModal;
     window.closeSettingsModal = closeSettingsModal;
+    window.openSupportUrl = openSupportUrl;
     window.selectPalette = selectPalette;
     window.selectBrightness = selectBrightness;
     window.selectLanguage = selectLanguage;

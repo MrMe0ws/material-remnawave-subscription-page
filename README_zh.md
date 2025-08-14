@@ -14,6 +14,10 @@
 * * **自定义组**  
 通过集成文件向应用程序部分添加额外组的能力，[例如，`TV 部分`](https://github.com/legiz-ru/my-remnawave/blob/main/sub-page/multiapp/app-config.json)。
 
+*   **品牌支持：** 通过 `app-config.json` 配置中的 `logoUrl` 和 `supportUrl` 参数设置徽标和支持链接，实现页面个性化。
+
+*   **remnawave-json 支持：** 可将订阅页面集成到 https://github.com/Jolymmiels/remnawave-json（适配的 index.html 文件位于 remnawave-json 文件夹中）。
+
 * **单独链接复制：** 除了主要订阅链接外，还可以直接从页面复制单独链接（例如 `vless://`、`trojan://`）。
 
 * **多语言支持：** 页面支持俄语、英语、波斯语和中文，具有自动浏览器语言检测功能。
