@@ -280,8 +280,9 @@
 </head>
 <body data-theme="candy-dark">
     <div class="appbar fixed top-0 z-1">
-        <div class="appbar-start-box">
-            <span id="title" class="appbar-heading ml-6" data-i18n="page_title">Подписка</span>
+        <div class="appbar-start-box pl-4 items-center gap-2">
+            <img id="branding-logo" class="h-8 w-8 hidden" src="" alt="Logo" onerror="this.style.display='none'">
+            <span class="appbar-heading"><%= metaTitle %></span>
         </div>
         <div class="appbar-end-box">
             <button id="settings-button" class="btn btn-appbar p-3 mr-2" style="position: fixed; top: 12px; right: 16px;z-index:1001;">
@@ -450,6 +451,10 @@
                 <div class="navbar-item-icon"><span class="material-symbols-outlined">link</span></div>
                 <span data-i18n="nav_links">Ссылки</span>
             </button>
+            <button id="navbar-support" class="navbar-item hidden" onclick="openSupportUrl()">
+                <div class="navbar-item-icon"><span class="material-symbols-outlined">support_agent</span></div>
+                <span data-i18n="nav_support">Поддержка</span>
+            </button>
         </div>
     </div>
 
@@ -460,6 +465,7 @@
     let currentLanguage = 'ru';
     let currentSectionId = 'status-section';
     let appsConfig = null;
+    let supportUrl = '';
 
     const availablePalettes = ['candy', 'mint', 'latte', 'nautical', 'lavender', 'evergreen', 'red', 'grey'];
 
@@ -493,8 +499,8 @@
             apps_title: 'Приложения', choose_app_title: 'Выберите приложение', choose_platform_title: 'Выберите платформу',
             username_label: 'Имя пользователя:', status_label: 'Статус:', expires_at_label: 'Срок действия:',
             days_left_label: 'Дней осталось:', traffic_label: 'Трафик:', traffic_reset_strategy_label: 'Сброс трафика:',
-            subscription_link_label: 'Ссылка подписки', server_label: 'Сервер', copied_to_clipboard: 'Скопировано в буфер обмена!',
-            nav_status: 'Статус', nav_apps: 'Приложения', nav_links: 'Ссылки', settings_title: 'Настройки',
+            subscription_link_label: 'Ссылка подписки', support_link_label: 'Ссылка поддержки', server_label: 'Сервер', copied_to_clipboard: 'Скопировано в буфер обмена!',
+            nav_status: 'Статус', nav_apps: 'Приложения', nav_links: 'Ссылки', nav_support: 'Поддержка', settings_title: 'Настройки',
             theme_label: 'Цветовая схема:', brightness_label: 'Яркость:', language_label: 'Язык:',
             light_mode: 'Светлая', dark_mode: 'Тёмная', auto_mode: 'Авто', candy_theme: 'Candy', mint_theme: 'Mint',
             latte_theme: 'Latte', nautical_theme: 'Nautical', lavender_theme: 'Lavender', evergreen_theme: 'Evergreen',
@@ -511,8 +517,8 @@
             apps_title: 'Applications', choose_app_title: 'Choose Application', choose_platform_title: 'Choose Platform',
             username_label: 'Username:', status_label: 'Status:', expires_at_label: 'Expires:',
             days_left_label: 'Days left:', traffic_label: 'Traffic:', traffic_reset_strategy_label: 'Traffic reset:',
-            subscription_link_label: 'Subscription link', server_label: 'Server', copied_to_clipboard: 'Copied to clipboard!',
-            nav_status: 'Status', nav_apps: 'Apps', nav_links: 'Links', settings_title: 'Settings',
+            subscription_link_label: 'Subscription link', support_link_label: 'Support Link', server_label: 'Server', copied_to_clipboard: 'Copied to clipboard!',
+            nav_status: 'Status', nav_apps: 'Apps', nav_links: 'Links', nav_support: 'Support', settings_title: 'Settings',
             theme_label: 'Color scheme:', brightness_label: 'Brightness:', language_label: 'Language:',
             light_mode: 'Light', dark_mode: 'Dark', auto_mode: 'Auto', candy_theme: 'Candy', mint_theme: 'Mint',
             latte_theme: 'Latte', nautical_theme: 'Nautical', lavender_theme: 'Lavender', evergreen_theme: 'Evergreen',
@@ -529,8 +535,8 @@
             apps_title: 'برنامه‌ها', choose_app_title: 'انتخاب برنامه', choose_platform_title: 'انتخاب پلتفرم',
             username_label: 'نام کاربری:', status_label: 'وضعیت:', expires_at_label: 'انقضا:',
             days_left_label: 'روزهای باقی‌مانده:', traffic_label: 'ترافیک:', traffic_reset_strategy_label: 'بازنشانی ترافیک:',
-            subscription_link_label: 'لینک اشتراک', server_label: 'سرور', copied_to_clipboard: 'در کلیپ‌بورد کپی شد!',
-            nav_status: 'وضعیت', nav_apps: 'برنامه‌ها', nav_links: 'لینک‌ها', settings_title: 'تنظیمات',
+            subscription_link_label: 'لینک اشتراک', support_link_label: 'لینک پشتیبانی', server_label: 'سرور', copied_to_clipboard: 'در کلیپ‌بورد کپی شد!',
+            nav_status: 'وضعیت', nav_apps: 'برنامه‌ها', nav_links: 'لینک‌ها', nav_support: 'پشتیبانی', settings_title: 'تنظیمات',
             theme_label: 'طرح رنگ:', brightness_label: 'روشنایی:', language_label: 'زبان:',
             light_mode: 'روشن', dark_mode: 'تیره', auto_mode: 'خودکار', candy_theme: 'آب‌نبات', mint_theme: 'نعنا',
             latte_theme: 'لاته', nautical_theme: 'دریایی', lavender_theme: 'اسطوخودوس', evergreen_theme: 'همیشه‌سبز',
@@ -547,8 +553,8 @@
             apps_title: '应用程序', choose_app_title: '选择应用程序', choose_platform_title: '选择平台',
             username_label: '用户名:', status_label: '状态:', expires_at_label: '到期时间:',
             days_left_label: '剩余天数:', traffic_label: '流量:', traffic_reset_strategy_label: '流量重置:',
-            subscription_link_label: '订阅链接', server_label: '服务器', copied_to_clipboard: '已复制到剪贴板！',
-            nav_status: '状态', nav_apps: '应用', nav_links: '链接', settings_title: '设置',
+            subscription_link_label: '订阅链接', support_link_label: '支持链接', server_label: '服务器', copied_to_clipboard: '已复制到剪贴板！',
+            nav_status: '状态', nav_apps: '应用', nav_links: '链接', nav_support: '支持', settings_title: '设置',
             theme_label: '配色方案:', brightness_label: '亮度:', language_label: '语言:',
             light_mode: '浅色', dark_mode: '深色', auto_mode: '自动', candy_theme: '糖果', mint_theme: '薄荷',
             latte_theme: '拿铁', nautical_theme: '航海', lavender_theme: '薰衣草', evergreen_theme: '常青',
@@ -590,15 +596,13 @@
         ['status-section', 'apps-section', 'links-section'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
         document.getElementById(sectionId)?.classList.remove('hidden');
         
-        document.querySelectorAll('.navbar-item').forEach(item => item.classList.remove('navbar-item-active'));
+        document.querySelectorAll('.navbar-item').forEach(item => {
+            if (item.id !== 'navbar-support') { // Не трогаем кнопку поддержки
+                item.classList.remove('navbar-item-active');
+            }
+        });
         document.getElementById(navbarItemId)?.classList.add('navbar-item-active');
 
-        const titles = {
-            'status-section': getTranslation('nav_status'),
-            'apps-section': getTranslation('apps_title'),
-            'links-section': getTranslation('nav_links')
-        };
-        document.getElementById('title').textContent = titles[sectionId] || getTranslation('page_title');
         currentSectionId = sectionId;
 
         if (sectionId === 'apps-section' && window.appsData) {
@@ -615,7 +619,6 @@
             else el.textContent = translation;
         });
         document.getElementById('page-title').textContent = getTranslation('page_title');
-        setPage(document.querySelector('.navbar-item-active')?.id, currentSectionId);
         updateDisplayedDataTranslations();
     }
 
@@ -677,7 +680,60 @@
             const encodedPanelData = '<%= panelData %>';
             const decodedData = decodeAndParseData(encodedPanelData);
             const loadedAppsConfig = await appsConfigPromise;
-            setupLanguageSelector(loadedAppsConfig); // Настраиваем языки
+
+            // --- NEW BRANDING LOGIC ---
+            const branding = loadedAppsConfig?.config?.branding;
+            if (branding) {
+                // Logo
+                if (branding.logoUrl) {
+                    const logoEl = document.getElementById('branding-logo');
+                    logoEl.src = branding.logoUrl;
+                    logoEl.classList.remove('hidden');
+                }
+                // Support URL
+                if (branding.supportUrl) {
+                    window.supportUrl = branding.supportUrl;
+                    document.getElementById('navbar-support').classList.remove('hidden');
+
+                    const supportLinksContainer = document.getElementById('subscription-links-card').querySelector('.flex.flex-col.gap-4');
+                    if (supportLinksContainer) {
+                        const card = document.createElement('div');
+                        card.className = 'server-card';
+
+                        const header = document.createElement('div');
+                        header.className = 'server-header';
+
+                        const info = document.createElement('div');
+                        info.className = 'server-info';
+                        const nameSpan = document.createElement('span');
+                        nameSpan.className = 'server-name';
+                        nameSpan.dataset.i18n = 'support_link_label';
+                        nameSpan.textContent = getTranslation('support_link_label');
+                        info.appendChild(nameSpan);
+
+                        const actions = document.createElement('div');
+                        actions.className = 'server-actions';
+
+                        const copyBtn = document.createElement('button');
+                        copyBtn.className = 'btn btn-tonal btn-icon';
+                        copyBtn.innerHTML = '<span class="material-symbols-outlined">content_copy</span>';
+                        copyBtn.onclick = () => copyToClipboard(branding.supportUrl);
+
+                        const qrBtn = document.createElement('button');
+                        qrBtn.className = 'btn btn-tonal btn-icon';
+                        qrBtn.innerHTML = '<span class="material-symbols-outlined">qr_code_2</span>';
+                        qrBtn.onclick = () => showQRCode(branding.supportUrl, getTranslation('support_link_label'));
+
+                        actions.append(copyBtn, qrBtn);
+                        header.append(info, actions);
+                        card.appendChild(header);
+                        supportLinksContainer.appendChild(card);
+                    }
+                }
+            }
+            // --- END BRANDING LOGIC ---
+
+            setupLanguageSelector(loadedAppsConfig);
             const formattedData = formatApiData(decodedData, loadedAppsConfig);
             displayData(formattedData);
         } catch (error) {
@@ -696,7 +752,8 @@
             if (!match) return 0;
             const val = parseFloat(match[1]);
             const unit = match[2].toLowerCase();
-            const units = { 'b': 1, 'kb': 1024, 'mb': 1024**2, 'gb': 1024**3, 'tib': 1024**4, 'tb': 1024**4 };
+            const units = { 'b': 1, 'kb': 1024, 'mb': 1024**2, 'gb': 1024**3, 'tb': 1024**4, 'pb': 1024**5 };
+            units['kib'] = units.kb; units['mib'] = units.mb; units['gib'] = units.gb; units['tib'] = units.tb; units['pib'] = units.pb;
             return val * (units[unit] || 1);
         };
         const servers = (response.links || []).map(link => {
@@ -713,8 +770,12 @@
         });
         return {
             username: user.username, user_status: user.userStatus, expires_at: user.expiresAt,
-            days_left: user.daysLeft, traffic_used: parseTraffic(user.trafficUsed),
-            traffic_limit: parseTraffic(user.trafficLimit), traffic_reset_strategy: user.trafficLimitStrategy,
+            days_left: user.daysLeft, 
+            traffic_used: parseTraffic(user.trafficUsed),
+            traffic_limit: parseTraffic(user.trafficLimit),
+            traffic_used_str: user.trafficUsed || '0 B',
+            traffic_limit_str: user.trafficLimit || getTranslation('unlimited'),
+            traffic_reset_strategy: user.trafficLimitStrategy,
             subscription_url: response.subscriptionUrl, cryptoLink: response.happ?.cryptoLink,
             servers, apps: appsConfig
         };
@@ -725,7 +786,12 @@
         document.getElementById('loading-spinner').classList.add('hidden');
         window.currentUserStatus = data.user_status;
         window.currentExpiresAt = data.expires_at;
-        window.currentTrafficData = { used: data.traffic_used, limit: data.traffic_limit };
+        window.currentTrafficData = { 
+            used: data.traffic_used, 
+            limit: data.traffic_limit,
+            used_str: data.traffic_used_str,
+            limit_str: data.traffic_limit_str
+        };
         window.currentTrafficResetStrategy = data.traffic_reset_strategy;
         window.subscriptionUrlForCopy = data.subscription_url;
 
@@ -771,7 +837,7 @@
         const trafficEl = document.getElementById('display-traffic');
         if (trafficEl && window.currentTrafficData) {
             const isUnlimited = window.currentTrafficData.limit === 0;
-            trafficEl.textContent = isUnlimited ? getTranslation('unlimited') : `${formatBytes(window.currentTrafficData.used)} / ${formatBytes(window.currentTrafficData.limit)}`;
+            trafficEl.textContent = isUnlimited ? getTranslation('unlimited') : `${window.currentTrafficData.used_str} / ${window.currentTrafficData.limit_str}`;
             document.getElementById('traffic-reset-field').style.display = isUnlimited ? 'none' : 'flex';
         }
         const resetEl = document.getElementById('display-traffic-reset-strategy');
@@ -1046,6 +1112,11 @@
     function formatBytes(bytes) { if (!bytes) return '0 B'; const k = 1024, sizes = ['B', 'KB', 'MB', 'GB', 'TB'], i = Math.floor(Math.log(bytes) / Math.log(k)); return `${parseFloat((bytes / k**i).toFixed(2))} ${sizes[i]}`; }
     function openSettingsModal() { document.getElementById('settings-modal').classList.add('active'); updateSettingsUI(); }
     function closeSettingsModal() { document.getElementById('settings-modal').classList.remove('active'); }
+    function openSupportUrl() {
+        if (window.supportUrl) {
+            window.Telegram?.WebApp.openLink(window.supportUrl) || window.open(window.supportUrl, '_blank');
+        }
+    }
     function selectPalette(p) { currentTheme = p; updateTheme(); updateSettingsUI(); saveSettings(); }
     function selectBrightness(b) { currentBrightness = b; updateTheme(); updateSettingsUI(); saveSettings(); }
     function selectLanguage(l) { currentLanguage = l; applyTranslations(); updateSettingsUI(); saveSettings(); }
@@ -1098,6 +1169,7 @@
     window.closeQRModal = closeQRModal;
     window.openSettingsModal = openSettingsModal;
     window.closeSettingsModal = closeSettingsModal;
+    window.openSupportUrl = openSupportUrl;
     window.selectPalette = selectPalette;
     window.selectBrightness = selectBrightness;
     window.selectLanguage = selectLanguage;
