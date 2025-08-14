@@ -145,6 +145,17 @@
     .appbar { background-color: var(--color-primary-container); display: flex; flex-direction: row; justify-content: space-between; height: 4rem; width: 100%; z-index: 100; position: fixed; top: 0; left: 0; }
     .appbar-start-box, .appbar-end-box { display: flex; flex-direction: row; align-items: center; }
     .appbar-heading { font-size: large; color: var(--color-on-primary-container); }
+
+    #branding-logo {
+        display: none;
+        max-height: 2rem;
+        max-width: 2rem;
+        object-fit: contain;
+    }
+
+    #branding-logo:not(.hidden) {
+        display: inline-block !important;
+    }
     
     .btn { background-color: var(--color-primary); border: 0.0625rem solid var(--color-outline); border-radius: 0.625rem; height: 2.5rem; padding-left: 1.5rem; padding-right: 1.5rem; font-size: medium; font-weight: 500; color: var(--color-on-primary); transition: background-color 0.3s, color 0.3s, border-color 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; text-decoration: none; }
     .btn:hover { background-color: var(--color-primary-container); color: var(--color-on-primary-container); }
@@ -681,58 +692,6 @@
             const decodedData = decodeAndParseData(encodedPanelData);
             const loadedAppsConfig = await appsConfigPromise;
 
-            // --- NEW BRANDING LOGIC ---
-            const branding = loadedAppsConfig?.config?.branding;
-            if (branding) {
-                // Logo
-                if (branding.logoUrl) {
-                    const logoEl = document.getElementById('branding-logo');
-                    logoEl.src = branding.logoUrl;
-                    logoEl.classList.remove('hidden');
-                }
-                // Support URL
-                if (branding.supportUrl) {
-                    window.supportUrl = branding.supportUrl;
-                    document.getElementById('navbar-support').classList.remove('hidden');
-
-                    const supportLinksContainer = document.getElementById('subscription-links-card').querySelector('.flex.flex-col.gap-4');
-                    if (supportLinksContainer) {
-                        const card = document.createElement('div');
-                        card.className = 'server-card';
-
-                        const header = document.createElement('div');
-                        header.className = 'server-header';
-
-                        const info = document.createElement('div');
-                        info.className = 'server-info';
-                        const nameSpan = document.createElement('span');
-                        nameSpan.className = 'server-name';
-                        nameSpan.dataset.i18n = 'support_link_label';
-                        nameSpan.textContent = getTranslation('support_link_label');
-                        info.appendChild(nameSpan);
-
-                        const actions = document.createElement('div');
-                        actions.className = 'server-actions';
-
-                        const copyBtn = document.createElement('button');
-                        copyBtn.className = 'btn btn-tonal btn-icon';
-                        copyBtn.innerHTML = '<span class="material-symbols-outlined">content_copy</span>';
-                        copyBtn.onclick = () => copyToClipboard(branding.supportUrl);
-
-                        const qrBtn = document.createElement('button');
-                        qrBtn.className = 'btn btn-tonal btn-icon';
-                        qrBtn.innerHTML = '<span class="material-symbols-outlined">qr_code_2</span>';
-                        qrBtn.onclick = () => showQRCode(branding.supportUrl, getTranslation('support_link_label'));
-
-                        actions.append(copyBtn, qrBtn);
-                        header.append(info, actions);
-                        card.appendChild(header);
-                        supportLinksContainer.appendChild(card);
-                    }
-                }
-            }
-            // --- END BRANDING LOGIC ---
-
             setupLanguageSelector(loadedAppsConfig);
             const formattedData = formatApiData(decodedData, loadedAppsConfig);
             displayData(formattedData);
@@ -781,6 +740,77 @@
         };
     }
 
+    function applyBranding(appsConfig) {
+        const branding = appsConfig?.config?.branding;
+        if (!branding) return;
+        
+        console.log('Applying branding:', branding);
+        
+        // Logo
+        if (branding.logoUrl) {
+            console.log('Setting logo URL:', branding.logoUrl);
+            const logoEl = document.getElementById('branding-logo');
+            if (logoEl) {
+                logoEl.onload = () => {
+                    console.log('Logo loaded successfully');
+                    // Убираем hidden и добавляем inline-block для отображения
+                    logoEl.classList.remove('hidden');
+                    logoEl.style.display = 'inline-block';
+                    logoEl.style.visibility = 'visible';
+                };
+                logoEl.onerror = () => {
+                    console.warn('Failed to load branding logo:', branding.logoUrl);
+                    logoEl.classList.add('hidden');
+                    logoEl.style.display = 'none';
+                };
+                logoEl.src = branding.logoUrl;
+            } else {
+                console.error('Logo element not found');
+            }
+        }
+                
+        // Support URL
+        if (branding.supportUrl) {
+            console.log('Setting support URL:', branding.supportUrl);
+            window.supportUrl = branding.supportUrl;
+            const supportNavBtn = document.getElementById('navbar-support');
+            if (supportNavBtn) {
+                supportNavBtn.classList.remove('hidden');
+            }
+
+            // Add support link to subscription links card
+            setTimeout(() => {
+                const subscriptionCard = document.getElementById('subscription-links-card');
+                const linksContainer = subscriptionCard?.querySelector('.flex.flex-col.gap-4.mt-4');
+                
+                if (linksContainer && !linksContainer.querySelector('[data-support-link]')) {
+                    const supportCard = document.createElement('div');
+                    supportCard.className = 'server-card';
+                    supportCard.setAttribute('data-support-link', 'true');
+                    
+                    supportCard.innerHTML = `
+                        <div class="server-header">
+                            <div class="server-info">
+                                <span class="server-name" data-i18n="support_link_label">${getTranslation('support_link_label')}</span>
+                            </div>
+                            <div class="server-actions">
+                                <button class="btn btn-tonal btn-icon" onclick="copyToClipboard('${branding.supportUrl}')">
+                                    <span class="material-symbols-outlined">content_copy</span>
+                                </button>
+                                <button class="btn btn-tonal btn-icon" onclick="showQRCode('${branding.supportUrl}', getTranslation('support_link_label') || 'Support Link')">
+                                    <span class="material-symbols-outlined">qr_code_2</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    linksContainer.appendChild(supportCard);
+                    console.log('Support link added to subscription card');
+                }
+            }, 100);
+        }
+    }
+
     function displayData(data) {
         console.log('Displaying data:', data);
         document.getElementById('loading-spinner').classList.add('hidden');
@@ -794,6 +824,7 @@
         };
         window.currentTrafficResetStrategy = data.traffic_reset_strategy;
         window.subscriptionUrlForCopy = data.subscription_url;
+        applyBranding(data.apps);
 
         document.getElementById('display-username').textContent = data.username;
         updateDisplayedDataTranslations(); 
@@ -1114,7 +1145,10 @@
     function closeSettingsModal() { document.getElementById('settings-modal').classList.remove('active'); }
     function openSupportUrl() {
         if (window.supportUrl) {
-            window.Telegram?.WebApp.openLink(window.supportUrl) || window.open(window.supportUrl, '_blank');
+            window.open(window.supportUrl, '_blank');
+            console.log('Opening support URL:', window.supportUrl);
+        } else {
+            console.warn('Support URL not set');
         }
     }
     function selectPalette(p) { currentTheme = p; updateTheme(); updateSettingsUI(); saveSettings(); }
