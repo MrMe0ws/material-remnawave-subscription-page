@@ -1,5 +1,7 @@
 [Русская версия](README.md) | [English Version](README_en.md) | [中文版](README_zh.md) | [نسخه فارسی](README_fa.md)
 
+[صفحه‌ی نمایشی](https://legiz-ru.github.io/Orion)
+
 # صفحه اشتراک Material Remnawave
 
 این مخزن حاوی کد منبع صفحه اشتراک پنل پروکسی Remnawave است که با طراحی مدرن Material Design 3 ایجاد شده است. این صفحه به کاربران دسترسی راحت به اطلاعات اشتراک، دستورالعمل‌های اتصال و لینک‌ها ارائه می‌دهد. کد با کمک مدل هوش مصنوعی Claude Sonnet 4 نوشته شده است.

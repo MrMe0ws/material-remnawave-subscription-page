@@ -1,5 +1,7 @@
 [Русская версия](README.md) | [English Version](README_en.md) | [中文版](README_zh.md) | [نسخه فارسی](README_fa.md)
 
+[Демонстрационная страница](https://legiz-ru.github.io/material-remnawave-subscription-page)
+
 # Material Remnawave Subscription page
 
 Данный репозиторий содержит исходный код страницы подписки для панели прокси Remnawave, выполненной в современном стиле Material Design 3. Страница предоставляет пользователям удобный доступ к информации о подписке, инструкциям по подключению и ссылкам. Код написан с помощью нейросети Claude Sonnet 4.
