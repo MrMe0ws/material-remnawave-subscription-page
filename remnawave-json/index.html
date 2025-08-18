@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#EADDFF" id="theme-color-meta">
-    <meta name="description" content="<%= metaDescription %>" />
-    <title><%= metaTitle %></title>
+    <meta name="description" content="{{.MetaDescription}}" />
+    <title>{{.MetaTitle}}</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
   // Этот блок загружает шрифты с нескольких CDN для надежности.
@@ -294,7 +294,7 @@
     <div class="appbar fixed top-0 z-1">
         <div class="appbar-start-box pl-4 items-center gap-2">
             <img id="branding-logo" class="h-8 w-8 hidden" src="" alt="Logo" onerror="this.style.display='none'">
-            <span class="appbar-heading"><%= metaTitle %></span>
+            <span class="appbar-heading">{{.MetaTitle}}</span>
         </div>
         <div class="appbar-end-box">
             <button id="settings-button" class="btn btn-appbar p-3 mr-2" style="position: fixed; top: 12px; right: 16px;z-index:1001;">
@@ -703,7 +703,7 @@
     async function loadSubscriptionData() {
         try {
             const appsConfigPromise = loadAppsConfig();
-            const encodedPanelData = '<%= panelData %>';
+            const encodedPanelData = '{{.PanelData}}';
             const decodedData = decodeAndParseData(encodedPanelData);
             const loadedAppsConfig = await appsConfigPromise;
 
