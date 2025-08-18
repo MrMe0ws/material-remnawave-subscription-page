@@ -630,8 +630,22 @@
             if (el.tagName === 'INPUT' && el.type === 'text') el.placeholder = translation;
             else el.textContent = translation;
         });
-        document.getElementById('page-title').textContent = getTranslation('page_title');
         updateDisplayedDataTranslations();
+        
+        if (currentSectionId === 'apps-section') {
+            refreshAppsTranslations();
+        }
+    }
+    function refreshAppsTranslations() {
+        const appsSection = document.getElementById('apps-section');
+        if (appsSection) {
+            appsSection.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                const translation = getTranslation(key);
+                if (el.tagName === 'INPUT' && el.type === 'text') el.placeholder = translation;
+                else el.textContent = translation;
+            });
+        }
     }
 
     async function loadAppsConfig() {
@@ -1167,7 +1181,37 @@
     }
     function selectPalette(p) { currentTheme = p; updateTheme(); updateSettingsUI(); saveSettings(); }
     function selectBrightness(b) { currentBrightness = b; updateTheme(); updateSettingsUI(); saveSettings(); }
-    function selectLanguage(l) { currentLanguage = l; applyTranslations(); updateSettingsUI(); saveSettings(); }
+    function selectLanguage(l) {
+        currentLanguage = l;
+        localStorage.setItem('lang', l);
+        
+        document.querySelectorAll('.settings-radio-btn[data-language]').forEach(btn => {
+            btn.classList.toggle('selected', btn.dataset.language === l);
+        });
+        
+        applyTranslations();
+        
+        if (currentSectionId === 'apps-section' && window.appsData) {
+            console.log('Refreshing apps section for language change');
+            setTimeout(() => {
+                displayAppsSection();
+            }, 100);
+        }
+        
+        updateSupportLinkTranslation();
+        
+        updateSettingsUI();
+        saveSettings();
+    }
+    function updateSupportLinkTranslation() {
+        const supportCard = document.querySelector('[data-support-link]');
+        if (supportCard) {
+            const supportNameEl = supportCard.querySelector('[data-i18n="support_link_label"]');
+            if (supportNameEl) {
+                supportNameEl.textContent = getTranslation('support_link_label');
+            }
+        }
+    }
     function saveSettings() { localStorage.setItem('theme', `${currentTheme}-${currentBrightness}`); localStorage.setItem('lang', currentLanguage); }
     function updateTheme() {
         const actualBrightness = getActualBrightness();
@@ -1199,7 +1243,6 @@
             container.appendChild(card);
         });
     }
-
     // --- Инициализация при загрузке страницы ---
     document.addEventListener('DOMContentLoaded', () => {
         console.log('DOM loaded, initializing...');
