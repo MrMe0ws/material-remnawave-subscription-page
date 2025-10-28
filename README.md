@@ -1,5 +1,12 @@
 [Русская версия](README.md) | [English Version](README_en.md) | [中文版](README_zh.md) | [نسخه فارسی](README_fa.md)
 
+ЭТО ФОРК материл дизайн 3.0 страницы подписки remnawave. 
+Что я добавил от себя:
+- Если статус подписки EXPIRED, DISABLED, LIMITED и т. п. → открывается стр. «Статус», а не "Приложения". Так-как юзеру с истекшей подпиской не актуально читать гайд. Ему нужа информация о том, что его подписка просрочена 
+Истекший подписка будет вести на страницу статуса вместо приложений.
+
+
+
 [Демонстрационная страница](https://legiz-ru.github.io/material-remnawave-subscription-page)
 
 # Material Remnawave Subscription page
