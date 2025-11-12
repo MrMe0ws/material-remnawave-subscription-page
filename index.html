@@ -2082,6 +2082,9 @@
         </svg>`,
             'pc': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
             <path d="M21,16H3V4H21M21,2H3C1.89,2 1,2.89 1,4V16A2,2 0 0,0 3,18H10V20H8V22H16V20H14V18H21A2,2 0 0,0 23,16V4C23,2.89 22.1,2 21,2Z"/>
+        </svg>`,
+            'TV': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21,3H3C1.89,3 1,3.89 1,5V17A2,2 0 0,0 3,19H8V21H16V19H21A2,2 0 0,0 23,17V5C23,3.89 22.1,3 21,3M21,17H3V5H21V17Z"/>
         </svg>`
         };
 
@@ -2401,7 +2404,7 @@
             const trafficEl = document.getElementById('display-traffic');
             if (trafficEl && window.currentTrafficData) {
                 if (window.currentTrafficData.limit === 0) {
-                    trafficEl.textContent = getTranslation('unlimited');
+                    trafficEl.textContent = `${formatBytes(window.currentTrafficData.used)} / ∞`;
                 } else {
                     trafficEl.textContent = `${formatBytes(window.currentTrafficData.used)} / ${formatBytes(window.currentTrafficData.limit)}`;
                 }
@@ -2643,7 +2646,7 @@
             const trafficEl = document.getElementById('display-traffic');
             if (trafficEl) {
                 if (isUnlimited) {
-                    trafficEl.textContent = getTranslation('unlimited');
+                    trafficEl.textContent = `${formatBytes(data.traffic_used)} / ∞`;
                 } else {
                     trafficEl.textContent = `${formatBytes(data.traffic_used)} / ${formatBytes(data.traffic_limit)}`;
                 }
@@ -2939,7 +2942,7 @@
             if (step.description && step.description[currentLanguage]) {
                 const stepDesc = document.createElement('p');
                 stepDesc.className = 'app-step-description';
-                stepDesc.textContent = step.description[currentLanguage];
+                stepDesc.innerHTML = step.description[currentLanguage];
                 stepDiv.appendChild(stepDesc);
             }
 
@@ -3029,14 +3032,39 @@
             const platformNames = {
                 'ios': 'iOS',
                 'android': 'Android',
-                'pc': 'PC'
+                'pc': 'PC',
+                'TV': 'TV'
             };
 
             platformKeys.forEach((platform) => {
                 const tab = document.createElement('button');
                 const isActive = platform === preferredPlatform;
                 tab.className = `os-tab${isActive ? ' active' : ''}`;
-                tab.textContent = platformNames[platform] || platform.charAt(0).toUpperCase() + platform.slice(1);
+
+                // Используем SVG иконки из appIcons
+                const icon = appIcons[platform] || appIcons['pc'];
+                const name = platformNames[platform] || platform.charAt(0).toUpperCase() + platform.slice(1);
+
+                // Создаем контейнер для иконки и текста
+                const tabContent = document.createElement('div');
+                tabContent.style.display = 'flex';
+                tabContent.style.alignItems = 'center';
+                tabContent.style.gap = '0.5rem';
+
+                // Добавляем иконку с уменьшенным размером для вкладки
+                const iconWrapper = document.createElement('span');
+                iconWrapper.style.display = 'inline-flex';
+                iconWrapper.style.alignItems = 'center';
+                iconWrapper.innerHTML = icon.replace('w-6 h-6', 'w-4 h-4');
+
+                // Добавляем текст
+                const textSpan = document.createElement('span');
+                textSpan.textContent = name;
+
+                tabContent.appendChild(iconWrapper);
+                tabContent.appendChild(textSpan);
+                tab.appendChild(tabContent);
+
                 tab.onclick = () => switchOSTab(platform, tab);
                 osTabsContainer.appendChild(tab);
             });
