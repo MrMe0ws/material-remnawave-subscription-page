@@ -2994,7 +2994,10 @@
                         subscriptionUrl = encodeURIComponent(subscriptionUrl);
                     }
 
-                    url = app.urlScheme + subscriptionUrl;
+                    // Формируем deep link
+                    const deepLink = app.urlScheme + subscriptionUrl;
+                    // Перенаправляем через страницу переадресации
+                    url = 'https://mrme0ws.github.io/redirect-page/?redirect_to=' + encodeURIComponent(deepLink);
                 }
 
                 subscriptionButton.href = url;
