@@ -2906,7 +2906,7 @@
 
             stepOrder.forEach(stepKey => {
                 if (app[stepKey]) {
-                    const stepElement = createStepElement(app[stepKey], stepKey, app, data);
+                    const stepElement = createStepElement(app[stepKey], stepKey, app, data, platform);
                     if (stepElement) {
                         stepsContainer.appendChild(stepElement);
                     }
@@ -2917,7 +2917,7 @@
             return detailsDiv;
         }
 
-        function createStepElement(step, stepKey, app, data) {
+        function createStepElement(step, stepKey, app, data, platform) {
             const stepDiv = document.createElement('div');
             stepDiv.className = 'app-step';
 
@@ -2983,7 +2983,8 @@
 
                 let url = '#';
 
-                if (app.id === 'happ' && data.cryptoLink) {
+                // Для мобильных платформ (iOS/Android) используем cryptoLink, для PC - обычную логику
+                if (app.id === 'happ' && data.cryptoLink && (platform === 'ios' || platform === 'android')) {
                     url = data.cryptoLink;
                 } else if (app.urlScheme && data.subscription_url) {
                     let subscriptionUrl = data.subscription_url;
